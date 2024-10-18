@@ -1,0 +1,250 @@
+/*!*******************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[2].use[2]!./src/style.css ***!
+  \*******************************************************************************************************************************************************************/
+.form-table {
+    width: 100% !important;
+    border-collapse: separate !important;
+    border-spacing: 0px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    border: 1px solid #ccc !important;
+    margin: 10px 0 20px 0 !important;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.form-table thead, .form-table tbody {
+    display: flex !important;
+    flex-direction: column;
+}
+
+.form-table tr {
+    display: flex !important;
+    flex-direction: row !important;
+    background-color: #f9f9f9;
+    padding: 10px !important;
+    gap: 10px;
+}
+
+.form-table th, .form-table td {
+    padding: 0px !important;
+    text-align: left;
+    border: none;
+    width: 99% !important;
+}
+
+.form-table .actions, .form-table .action, .form-table .enumerations, .form-table .enum {    
+    width: -moz-min-content !important;    
+    width: min-content !important;
+}
+
+.form-table .enum {
+    display: flex;
+    align-items: center;
+    justify-self: center;
+}
+
+.form-table .button-link-delete {
+    background-color: transparent;
+    color: #fff;
+    border: 1px solid #ff0000 !important;
+    color: #ff0000 !important;
+    padding: 2px !important;
+    border-radius: 5px;
+    cursor: pointer;
+    height: 25px;
+    width: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+} 
+
+.form-table .actions {
+    padding: 0px 12.5px !important;
+}
+
+.form-table input {
+    width: 100% !important;
+}
+
+.form-wrap .actions {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    gap: 10px;
+    width: -moz-max-content;
+    width: max-content;
+}
+
+.form-wrap .actions.translations-actions {
+    bottom: 0 !important;
+    position: sticky !important;
+    background: #f0f0f1;
+    width: 100%;
+    padding: 6px;
+}
+
+.button.button-red {
+    background: #d91313;
+    color: #fff;
+    border: #d91313;
+}
+
+.translations-form-tools {
+    display: flex;
+    flex-direction: row;
+    padding: 10px;
+    align-items: bottom;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: 10px;
+    border: 1px solid #ccc !important;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.translations-form-tools .buttons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 8px;
+}
+
+.missing-translations {
+    padding: 15px;
+}
+
+.spinner-box {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    justify-content: left;
+    margin: 10px 0;
+}
+
+.ctp-separator {
+    width: 100%;
+    height: 1px;
+    display: block;
+    background-color: #ccc;
+    margin: 5px 0; 
+}
+
+.ctp-blank-separator {
+    width: 100%;
+    height: 1px;
+    display: block;
+    margin: 10px 0;
+}
+
+/* modal */
+.ctp-modal-wrap {
+    position: fixed;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.ctp-modal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ctp-modal .modal-header .close-modal {
+    border-radius: 50%;
+    padding: 5px;
+    border: 1px solid #0c0c0c;
+    cursor: pointer;
+}
+
+.ctp-modal {
+    z-index: 12;
+    background: #fff;
+    border-radius: 8px;
+    padding: 10px;
+    position: relative;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: -moz-max-content;
+    width: max-content;
+    height: -moz-max-content;
+    height: max-content;
+}
+
+.ctp-modal-overlay {
+    position: absolute;
+    margin: auto;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 11;
+    background: #00000050;
+}
+
+/* Info box */
+.info-box {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+/* Responsive table - displays properly on mobile */
+@media (max-width: 768px) {
+    table {
+        display: flex;
+        flex-direction: column;
+        border: none;
+    }
+
+    thead {
+        display: flex;
+        flex-direction: column;
+        border-right: 2px solid #ccc;
+        flex: 1;
+    }
+
+    tbody {
+        display: flex;
+        flex-direction: column;
+        flex: 2;
+    }
+
+    th, td {
+        display: block;
+        width: 100%;
+    }
+
+    /* Align table headers and body side by side */
+    tr {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    th, td {
+        width: 45%;
+    }
+
+    th {
+        border-right: none;
+    }
+
+    td {
+        border-left: none;
+    }
+}
+
+/*# sourceMappingURL=style-App.css.map*/
