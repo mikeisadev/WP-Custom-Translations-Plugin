@@ -3,7 +3,7 @@
 ## General information
 - **Author**: Michele Mincone
 - **Date**: 18 October 2024
-- **Version**: v1.0.0
+- **Version**: v1.1.0
 - **Data Structure**: JSON
 - **Plugin name**: Custom Translations Plugin by Michele Mincone (IT: Traduzioni Personalizzate - Plugin by Michele Mincone)
 - **Developer website**: [https://michelemincone.com](https://michelemincone.com)
