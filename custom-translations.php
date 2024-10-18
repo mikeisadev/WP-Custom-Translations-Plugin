@@ -20,7 +20,7 @@ define('CTP_PLUGIN_VERSION', '1.0.0');
 define('CTP_PLUGIN_AUTHOR', 'Michele Mincone');
 define('CTP_PLUGIN_AUTHOR_URI', 'https://michelemincone.com');
 define('CTP_PLUGIN_VERSION_TYPE', 'BETA');
-define('CTP_PLUGIN_NAME', 'Custom Translations Pluhin - By Michele Mincone');
+define('CTP_PLUGIN_NAME', 'Custom Translations Plugin - By Michele Mincone');
 
 /**
  * Define this plugin dir path and the url. 
@@ -62,20 +62,3 @@ register_activation_hook( __FILE__, 'ctp_activation' );
  * Init.
  */
 CTP_Init::getInstance();
-
-// $json = '[{"english_string":"Add to cart","italian_translation_string":"hello world"}]';
-
-// if (is_string($json)) {
-
-//     $decoded = json_decode($json, true);
-
-//     if (is_array($decoded)) {
-//         echo "is json array";
-
-//         echo "<pre>";
-//         print_r($decoded);  
-//         echo "</pre>";
-//         return;
-//     }
-//     echo "is json string";
-// }

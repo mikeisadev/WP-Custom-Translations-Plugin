@@ -51,7 +51,7 @@ class CTP_Translations_REST_API {
         register_rest_route(CTP_REST_NAMESPACE, '/translations', [
             'methods'               => \WP_REST_Server::READABLE,
             'callback'              => [$this, 'get_translations'],
-            'permission_callback'   => [$this, 'user_has_privileges'],
+            // 'permission_callback'   => [$this, 'user_has_privileges'],
         ]);
 
         register_rest_route(CTP_REST_NAMESPACE, '/translations', [
@@ -86,7 +86,6 @@ class CTP_Translations_REST_API {
      * Get translations.
      */
     public function get_translations(\WP_REST_Request $request) {
-        $headers = $request->get_headers();
         $nonce = $request->get_header('x_wp_nonce');
         
         if (!wp_verify_nonce($nonce, 'wp_rest')) {
@@ -94,17 +93,17 @@ class CTP_Translations_REST_API {
         }
 
         // Generate translations if not present 
-        CTP_Translations_Data::generate_translations_option();
+        CTP_Translations_Data::generate_ctp_translations_option(empty_translations: false);
 
-        // Get and decode translations.
-        $translations = json_decode( get_option('ctp-translations'), true );
+        // Get and decode translations and meta data.
+        $data = CTP_Translations_Data::get_translations_and_meta_data(decode: true);
 
         // Check if data structure is correct.
-        if ( !CTP_Translations_Data::verify_translations_data_structure($translations) ) {
+        if ( !CTP_Translations_Data::verify_translations_data_structure($data['translations']) ) {
             return new \WP_REST_Response(['message' => 'Invalid data structure'], 500);
         }
 
-        return new \WP_REST_Response($translations, 200);
+        return new \WP_REST_Response($data, 200);
     }
 
     /**

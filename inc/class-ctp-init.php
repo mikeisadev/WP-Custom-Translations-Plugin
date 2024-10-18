@@ -5,7 +5,8 @@ namespace CTP;
 use CTP\CTP_SettingsPage;
 use CTP\CTP_Assets;
 use CTP\CTP_Translations_REST_API;
-use CTP\CTP_Apply_Translations;;
+use CTP\CTP_Apply_Translations;
+use CTP\CTP_Default_Translations;
 
 if (!defined('ABSPATH')) exit;
 
@@ -88,6 +89,7 @@ final class CTP_Init {
         require_once CTP_DIR . '/inc/class-ctp-assets.php';
         require_once CTP_DIR . '/inc/class-ctp-translations-rest-api.php';
         require_once CTP_DIR . '/inc/class-ctp-apply-translations.php';
+        require_once CTP_DIR . '/inc/class-ctp-default-translations.php';
     }
     
     /**

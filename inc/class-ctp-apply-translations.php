@@ -26,10 +26,15 @@ class CTP_Apply_Translations {
     private function __clone() {}
 
     public function apply_translations() {
+        // Get only the translations!
         $translations = CTP_Translations_Data::get_translation_data();
 
-        if (!$translations) return;
+        // Verify the data structure.
+        if (!CTP_Translations_Data::verify_translations_data_structure($translations)) {
+            wp_die(__('Invalid translation data structure. Impossible to read translations data structure to apply translations!', 'ctp-translations'));
+        }
 
+        // Apply the translations.
         foreach ($translations as $translation) {
 
             add_filter(

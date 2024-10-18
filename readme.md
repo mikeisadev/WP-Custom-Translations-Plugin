@@ -50,7 +50,9 @@ Future versions of this plugin will provide:
 ### 1.0.0
 - Initial release
 ### 1.1.0
-- Improved JSON data strucure
+- Improved JSON data strucure:
+    - Last modified time
+- Export file name changed
 - Minor issues resolved and bug fixing
 - Little improvements on security and React Typescript frontend user interface
 
