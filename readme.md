@@ -49,6 +49,10 @@ Future versions of this plugin will provide:
 ## Changelog
 ### 1.0.0
 - Initial release
+### 1.1.0
+- Improved JSON data strucure
+- Minor issues resolved and bug fixing
+- Little improvements on security and React Typescript frontend user interface
 
 ## License
 This plugin is licensed under the [GPLv2 or later](https://www.gnu.org/licenses/gpl-2.0.html).
