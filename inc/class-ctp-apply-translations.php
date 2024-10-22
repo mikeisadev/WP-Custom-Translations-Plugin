@@ -29,6 +29,10 @@ class CTP_Apply_Translations {
         // Get only the translations!
         $translations = CTP_Translations_Data::get_translation_data();
 
+        if (empty($translations)) {
+            return;
+        }
+
         // Verify the data structure.
         if (!CTP_Translations_Data::verify_translations_data_structure($translations)) {
             wp_die(__('Invalid translation data structure. Impossible to read translations data structure to apply translations!', 'ctp-translations'));
@@ -41,10 +45,10 @@ class CTP_Apply_Translations {
                 'gettext', 
                 function($translated, $text, $domain) use ($translation) {
                     $english_string = strtolower($translation['english_string']);
-                    $translated_string = strtolower($translation['italian_translation_string']);
+                    $translated_string = $translation['italian_translation_string'];
 
                     if (strtolower($text) === $english_string) {
-                        return $translated_string;
+                        return esc_html(strip_tags($translated_string));
                     }
 
                     return $translated;

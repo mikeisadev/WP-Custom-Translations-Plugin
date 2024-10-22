@@ -51,7 +51,7 @@ class CTP_Translations_REST_API {
         register_rest_route(CTP_REST_NAMESPACE, '/translations', [
             'methods'               => \WP_REST_Server::READABLE,
             'callback'              => [$this, 'get_translations'],
-            // 'permission_callback'   => [$this, 'user_has_privileges'],
+            'permission_callback'   => [$this, 'user_has_privileges'],
         ]);
 
         register_rest_route(CTP_REST_NAMESPACE, '/translations', [
@@ -63,6 +63,12 @@ class CTP_Translations_REST_API {
         register_rest_route(CTP_REST_NAMESPACE, '/translations', [
             'methods'               => \WP_REST_Server::DELETABLE,
             'callback'              => [$this, 'delete_translations'],
+            'permission_callback'   => [$this, 'user_has_privileges'],
+        ]);
+
+        register_rest_route(CTP_REST_NAMESPACE, '/translations/regenerate', [
+            'methods'               => \WP_REST_Server::CREATABLE,
+            'callback'              => [$this, 'regenerate_default_translations'],
             'permission_callback'   => [$this, 'user_has_privileges'],
         ]);
 
@@ -93,13 +99,14 @@ class CTP_Translations_REST_API {
         }
 
         // Generate translations if not present 
-        CTP_Translations_Data::generate_ctp_translations_option(empty_translations: false);
+        CTP_Translations_Data::generate_ctp_translations_option(empty_translations: false, force:false);
 
         // Get and decode translations and meta data.
         $data = CTP_Translations_Data::get_translations_and_meta_data(decode: true);
+        $translations = CTP_Translations_Data::verify_translations_data_structure($data['translations']);
 
         // Check if data structure is correct.
-        if ( !CTP_Translations_Data::verify_translations_data_structure($data['translations']) ) {
+        if ( !$translations && !is_array($translations) ) {
             return new \WP_REST_Response(['message' => 'Invalid data structure'], 500);
         }
 
@@ -125,20 +132,30 @@ class CTP_Translations_REST_API {
         }
 
         $translations = $body['translations_data'];
+        $translations = CTP_Translations_Data::verify_translations_data_structure($translations);
 
-        if ( !CTP_Translations_Data::verify_translations_data_structure($translations) ) {
+        if ( !$translations && !is_array($translations) ) {
             return new \WP_REST_Response(['message' => 'Invalid data structure'], 500);
         }
 
         // Save translations
-        update_option('ctp-translations', json_encode($translations));
+        if (CTP_Translations_Data::insert_translation_data($translations)) {
 
-        return new \WP_REST_Response([
-            'translations_data'     => $translations,
-            'message'                => 'Traduzioni salvate con successo',
-            'status'                => 200,
-            'status_message'        => 'OK'
-        ], 201);
+            return new \WP_REST_Response([
+                'translations_data'     => CTP_Translations_Data::get_translations_and_meta_data(decode: true),
+                'message'               => 'Traduzioni salvate con successo',
+                'status'                => 200,
+                'status_message'        => 'OK'
+            ], 201);
+
+        } else {
+
+            return new \WP_REST_Response(
+                ['message' => 'Si è verificato un errore durante il salvataggio delle traduzioni'], 500
+            );
+
+        }
+
     }
 
     /**
@@ -154,15 +171,42 @@ class CTP_Translations_REST_API {
         }
 
         if (CTP_Translations_Data::delete_translation_data()) {
-            $translations = CTP_Translations_Data::get_translation_data();
 
             return wp_send_json([
-                'message'       => 'Traduzioni eliminate con successo',
-                'translations'  => $translations
+                'message'           => 'Traduzioni eliminate con successo',
+                'translations_data' => CTP_Translations_Data::get_translations_and_meta_data(decode: true)
             ], 200);
+
         }
 
         return new \WP_REST_Response(['message' => 'Si è verificato un errore durante la cancellazione delle traduzioni'], 500);
+    }
+
+    /**
+     * Regenerate default translations.
+     */
+    public function regenerate_default_translations(\WP_REST_Request $request) {
+        $body = $request->get_json_params();
+        $headers = $request->get_headers();
+        $nonce = $request->get_header('x_wp_nonce');
+
+        if (!wp_verify_nonce($nonce, 'wp_rest')) {
+            return new \WP_REST_Response(['message' => 'Invalid nonce'], 403);
+        }
+
+        /**
+         * Do not generate empty translations, but force the generation of the translations.
+         */
+        if (CTP_Translations_Data::generate_ctp_translations_option(empty_translations: false, force: true)) {
+ 
+            return wp_send_json([
+                'message'           => 'Traduzioni di default rigenerate con successo',
+                'translations_data' => CTP_Translations_Data::get_translations_and_meta_data(decode: true)
+            ], 200);
+
+        } 
+        
+        return new \WP_REST_Response(['message' => 'Si è verificato un errore durante la rigenerazione delle traduzioni'], 500);
     }
 
     /**
@@ -181,7 +225,7 @@ class CTP_Translations_REST_API {
             return new \WP_REST_Response(['message' => 'Invalid nonce'], 403);
         }
 
-        if ( !array_key_exists('translations', $files) ) {
+        if ( !array_key_exists('ctp-translations', $files) ) {
             return $this->invalid_importing_file('invalid-file');
         }
 
@@ -193,15 +237,13 @@ class CTP_Translations_REST_API {
          * 
          * Then we do all the checks to verify if the file is valid.
          */
-        $translations_file = $files['translations'];
+        $translations_file = $files['ctp-translations'];
 
         foreach ($this->upload_file_data_keys as $key) {
             if ( !array_key_exists($key, $translations_file) ) {
                 return $this->invalid_importing_file('invalid-file');
             }
         }
-
-        // print_r($translations_file); // Only for debugging purposes.
 
         if ($translations_file['error'] !== UPLOAD_ERR_OK) {
             return $this->invalid_importing_file('invalid-file');
@@ -234,19 +276,25 @@ class CTP_Translations_REST_API {
             return $this->invalid_importing_file('invalid-json');
         }
 
-        // Verify if the data structure is correct.
-        if (!CTP_Translations_Data::verify_translations_data_structure($json_data_arr)) {
+        /**
+         * Verify if the data structure is correct.
+         * 
+         * And return the sanitized data structure.
+         */
+        $ctp_data = CTP_Translations_Data::verify_ctp_translation_array_structure($json_data_arr);
+
+        if (!$ctp_data) {
             return new \WP_REST_Response(['message' => 'Struttura dati non valida'], 500);
         }
 
         // Save imported translations.
-        update_option('ctp-translations', json_encode($json_data_arr));
+        CTP_Translations_Data::insert_translation_data($ctp_data['translations'], 'import_data_file');
 
         return new \WP_REST_Response([
-            'message'           => 'Traduzioni importate con successo',
-            'status'            => 200,
-            'status_message'    => 'OK',
-            'translations'      => $json_data_arr
+            'message'               => 'Traduzioni importate con successo!',
+            'status'                => 200,
+            'status_message'        => 'OK',
+            'translations_data'     => CTP_Translations_Data::get_translations_and_meta_data(decode: true)
         ], 200);
     }
 
@@ -267,16 +315,25 @@ class CTP_Translations_REST_API {
          * 
          * This to verify the integrity of the data structure.
          */
-        $translations = CTP_Translations_Data::get_translation_data(decode: true);
+        $ctp_data = CTP_Translations_Data::get_ctp_data(decode: true);
 
-        if ( !CTP_Translations_Data::verify_translations_data_structure($translations) ) {
+        $translations = CTP_Translations_Data::verify_translations_data_structure($ctp_data['translations']);
+
+        if ( !$translations && !is_array($translations) ) {
             return new \WP_REST_Response(['message' => 'Invalid data structure'], 500);
+        } else {
+
+            /**
+             * Re-encode the translations array to send a JSON response to the client.
+             */
+            return wp_send_json([
+                'message'           => 'Traduzioni esportate con successo. Ora salvale sul tuo computer!',
+                'json_file_name'    => 'exported-translations-' . wp_date('Y-m-d H:i:s', time()) . '.json',
+                'exported_json'     => json_encode($ctp_data)
+            ], 200);
+            
         }
 
-        /**
-         * Re-encode the translations array to send a JSON response to the client.
-         */
-        return wp_send_json(json_encode($translations), 200);
     }
 
     /**

@@ -8,6 +8,7 @@
 - **Plugin name**: Custom Translations Plugin by Michele Mincone (IT: Traduzioni Personalizzate - Plugin by Michele Mincone)
 - **Developer website**: [https://michelemincone.com](https://michelemincone.com)
 - **Available translatable languages**: Only one (italian for reference)
+- **Plugin language**: Only italian (for now)
 
 ## Description
 The Custom Translations Plugin for WordPress allows you to easily manage and customize translations for your website. Enhance your site's multilingual capabilities with user-friendly translation management.
@@ -51,10 +52,20 @@ Future versions of this plugin will provide:
 - Initial release
 ### 1.1.0
 - Improved JSON data strucure:
-    - Last modified time
+    - ID added inside 'translations' key
+    - The structure is not a direct translations array of object but is an object with following keys:
+        - 'general_info', 'meta_data' and 'translations'
+    - Meta data added: published time, timestamp, uuid, id type, modified by user id, modified by user priviliges
 - Export file name changed
 - Minor issues resolved and bug fixing
-- Little improvements on security and React Typescript frontend user interface
+- Major improvements on security and ID management on the front-end and back-end
+- Major and little React Typescript frontend user interface improvements and code refactoring
+- Code refactoring on frotend + utils functions
+- Added search bar input and 'clear search' button
+- Added pagination, entries per page for pagination and number of entries or search results
+- Improvements on ID management, now it's only on the code, but there is the choice to select between UUID or UINT (unique integers incrementally added)
+- Bug fixing on search results pagination and pagination on React Typescript frontend
+- Better management on the frontend on how inputs are updated (when typing the new translation or string to translate) and how this action is made while searching
 
 ## License
 This plugin is licensed under the [GPLv2 or later](https://www.gnu.org/licenses/gpl-2.0.html).

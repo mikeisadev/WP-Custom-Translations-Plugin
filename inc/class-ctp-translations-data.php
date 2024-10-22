@@ -9,6 +9,8 @@ use CTP\CTP_Default_Translations;
 class CTP_Translations_Data {
     public static string $option_name = 'ctp-translations-data';
 
+    private static string $id_type = 'uint';
+
     private static array $ctp_translations_data = [
         'general_info' => [
             'plugin_name'                => CTP_PLUGIN_NAME,
@@ -21,10 +23,11 @@ class CTP_Translations_Data {
         'meta_data' => [
             'published_on_date'          => null,
             'timestamp'                  => null,
-            'unique_id'                  => null,
+            'uuid'                       => null,
             'added_from_user_id'         => null,
             'added_from_user_priviliges' => null,
-            'translations_origin'        => 'default'
+            'translations_origin'        => 'default',
+            'id_type'                    => null
         ],
         'translations'                   => null
     ];
@@ -33,23 +36,41 @@ class CTP_Translations_Data {
     
     /*
      * Generate translations data option settings.
+     * 
+     * Default settings.
      */
-    public static function generate_ctp_translations_option(bool $empty_translations = false): void {
-        if ( !self::option_exists() ) {
+    public static function generate_ctp_translations_option(bool $empty_translations = false, bool $force = false): bool {
+        if (self::option_exists() && !$force) {
+            return false;
+        }
 
-            // Load meta data inside ctp data array.
-            self::load_ctp_meta_data(translations_origin: 'default');
+        // Load meta data inside ctp data array.
+        self::load_ctp_meta_data(translations_origin: 'default');
 
-            // Load default translations.
-            self::$ctp_translations_data['translations'] = !$empty_translations ? CTP_Default_Translations::$default_translations : [];
+        // Load default translations.
+        self::$ctp_translations_data['translations'] = !$empty_translations ?       
+            CTP_Default_Translations::get_default_translations(id_type: self::$id_type) : [];
             
-            // Insert data into wp_options table.
+        /**
+         * Insert data into wp_options table.
+         * 
+         * If option exists, update it.
+         * 
+         * Othwerwise, create it.
+         */
+        if (self::option_exists()) {
+            update_option(
+                self::$option_name,
+                json_encode( self::$ctp_translations_data )
+            );
+        } else {
             add_option(
                 self::$option_name,
                 json_encode( self::$ctp_translations_data )
             );
-            
         }
+
+        return true;
     }
 
     /**
@@ -62,22 +83,24 @@ class CTP_Translations_Data {
     /**
      * Insert translations data.
      */
-    public static function insert_translation_data(array $translations): bool {
+    public static function insert_translation_data(array $translations, $data_origin = 'insert_function'): bool {
         // Verify data integrity    
-        if (!self::verify_translations_data_structure($translations)) {
+        $translations = self::verify_translations_data_structure($translations);
+
+        if (!$translations && !is_array($translations)) {
             return false;
         }
 
         // Update ctp meta data.
-        self::load_ctp_meta_data(translations_origin: 'custom__insert_function');
+        self::load_ctp_meta_data(translations_origin: $data_origin);
 
         // Insert translations in the complete data structure.
         self::$ctp_translations_data['translations'] = $translations;
 
         // Insert data.
-        add_option(
+        update_option(
             self::$option_name,
-            self::$ctp_translations_data
+            json_encode( self::$ctp_translations_data )
         );
 
         return true;
@@ -125,14 +148,14 @@ class CTP_Translations_Data {
     public static function delete_translation_data(): bool {
         if (self::option_exists()) {
             // Update meta data.
-            self::load_ctp_meta_data(translations_origin: 'custom__deleted');
+            self::load_ctp_meta_data(translations_origin: 'delete_function');
 
             // Empty translations
             self::$ctp_translations_data['translations'] = [];
 
             update_option( 
                 self::$option_name,
-                json_encode(self::$ctp_translations_data)
+                json_encode( self::$ctp_translations_data )
             );
 
             return true;
@@ -143,7 +166,7 @@ class CTP_Translations_Data {
              * 
              * This to reduce bugs at minimum.
              */
-            self::load_ctp_meta_data(translations_origin: 'custom__deleted');
+            self::load_ctp_meta_data(translations_origin: 'delete_function');
             self::generate_ctp_translations_option(empty_translations: true);
 
             return true;
@@ -156,85 +179,112 @@ class CTP_Translations_Data {
      * Load meta data inside ctp data structure.
      */
     public static function load_ctp_meta_data(string $translations_origin = 'default'): bool {
-        self::$ctp_translations_data['meta_data']['published_on_date'] = date('Y-m-d H:i:s');
-        self::$ctp_translations_data['meta_data']['timestamp'] = time();
-        self::$ctp_translations_data['meta_data']['unique_id'] = uniqid();
+        $timestamp = time();
+
+        self::$ctp_translations_data['meta_data']['published_on_date'] = wp_date('Y-m-d H:i:s', $timestamp);
+        self::$ctp_translations_data['meta_data']['timestamp'] = $timestamp;
+        self::$ctp_translations_data['meta_data']['uuid'] = wp_generate_uuid4();
         self::$ctp_translations_data['meta_data']['added_from_user_id'] = get_current_user_id();
         self::$ctp_translations_data['meta_data']['added_from_user_priviliges'] = get_userdata(get_current_user_id())->roles;
         self::$ctp_translations_data['meta_data']['translations_origin'] = $translations_origin;
+        self::$ctp_translations_data['meta_data']['id_type'] = self::$id_type;
 
         return true;
     }
     
     /**
-     * Verify translations data structure.
+     * Verify translations data structure and do sanitization (tag stripping is under evaluation).
      * 
      * So verify only the translations not the entire CTP data structure.
      */
-    public static function verify_translations_data_structure(array $translations): bool {
+    public static function verify_translations_data_structure(array $translations): bool|array {
         if ( !is_array($translations) ) {
             return false;
+        }
+
+        /**
+         * If the array is empty there is no problem.
+         * 
+         * Return an empty array;
+         */
+        if ( empty($translations) ) {
+            return [];
         }
 
         // Get array keys.
         $translations_keys = array_keys( CTP_Default_Translations::$default_translations[0] );
 
         // Verify the translations!
-        foreach ($translations as $translation) {
+        foreach ($translations as $c => $translation) {
             if ( !is_array($translation) ) {
                 return false;
             }
 
+            // Verify keys.
             foreach ($translations_keys as $k) {
                 if ( !array_key_exists($k, $translation) ) {
                     return false;
                 }
+
+                // Sanitize and strip tags.
+                $translations[$c][$k] = sanitize_text_field(strip_tags($translation[$k]));
             }
         }
 
-        return true;
+        return $translations;
     }
 
 
     /**
      * Verify the integrity of the entire CTP data structure.
      */
-    public static function verify_ctp_translation_array_structure(array $ctp_data_structure): bool {
-        if ( !is_array($translations) ) {
+    public static function verify_ctp_translation_array_structure(array $ctp_data_structure): bool|array {
+        if ( !is_array($ctp_data_structure) ) {
             return false;
         }
 
         // Get default array keys to perform direct keys validation.
         $data_keys = array_keys( self::$ctp_translations_data );
         $general_info_keys = array_keys( self::$ctp_translations_data['general_info'] );
-        $translations_data_keys = array_keys( self::$ctp_translations_data['translations_data'] );
+        $translations_data_keys = array_keys( self::$ctp_translations_data['meta_data'] );
 
         // Verify first level keys
         foreach ($data_keys as $k) {
-            if ( !array_key_exists($k, $translations) ) {
+            if ( !array_key_exists($k, $ctp_data_structure) ) {
                 return false;
             }
         }
 
         // Verify general info keys
         foreach ($general_info_keys as $k) {
-            if ( !array_key_exists($k, $translations['general_info']) ) {
+            if ( !array_key_exists($k, $ctp_data_structure['general_info']) ) {
                 return false;
             }
         }
 
         // Verify translations data keys    
         foreach ($translations_data_keys as $k) {
-            if ( !array_key_exists($k, $translations['translations_data']) ) {
+            if ( !array_key_exists($k, $ctp_data_structure['meta_data']) ) {
                 return false;
             }
         }
 
-        // Verify the translations!
-        if (!self::verify_translations_data_structure($translations['translations'])) {
+        /**
+         * Sanitize translations data structure.
+         * 
+         * Then verify if the translations data structure is correct.
+         */
+        $sanitized_translations = self::verify_translations_data_structure($ctp_data_structure['translations']);
+
+        if (!$sanitized_translations && !is_array($sanitized_translations)) {
             return false;
         }
 
-        return true;
+        /**
+         * Put the sanitized translations back into the ctp data structure.
+         */
+        $ctp_data_structure['translations'] = $sanitized_translations;
+
+        return $ctp_data_structure;
     }
 }
