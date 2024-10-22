@@ -7,6 +7,8 @@ use CTP\CTP_Translations_Data;
  */
 function ctp_activation() {
 
-    CTP_Translations_Data::generate_translations_option();
+    if (!CTP_Translations_Data::option_exists()) {
+        CTP_Translations_Data::generate_ctp_translations_option();
+    }
 
 }
