@@ -8,6 +8,7 @@
 - **Plugin name**: Custom Translations Plugin by Michele Mincone (IT: Traduzioni Personalizzate - Plugin by Michele Mincone)
 - **Developer website**: [https://michelemincone.com](https://michelemincone.com)
 - **Available translatable languages**: Only one (italian for reference)
+- **Plugin language**: Only italian (for now)
 
 ## Description
 The Custom Translations Plugin for WordPress allows you to easily manage and customize translations for your website. Enhance your site's multilingual capabilities with user-friendly translation management.
