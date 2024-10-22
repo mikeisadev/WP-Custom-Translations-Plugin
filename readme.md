@@ -36,6 +36,8 @@ Future versions of this plugin will provide:
 - Seamless integration with WordPress
 - 'gettext' WordPress filter to apply translations
 - Export and import translations feature
+- Pagination, search translations and translations per page for pagination
+- Advice when you didn't saved translations to avoid losing progress
 
 ## Installation
 1. Download the plugin.
@@ -66,6 +68,7 @@ Future versions of this plugin will provide:
 - Improvements on ID management, now it's only on the code, but there is the choice to select between UUID or UINT (unique integers incrementally added)
 - Bug fixing on search results pagination and pagination on React Typescript frontend
 - Better management on the frontend on how inputs are updated (when typing the new translation or string to translate) and how this action is made while searching
+- An advice message (alert javascript message) is added if you didn't saved translations to avoid losing progress for mistake.
 
 ## License
 This plugin is licensed under the [GPLv2 or later](https://www.gnu.org/licenses/gpl-2.0.html).

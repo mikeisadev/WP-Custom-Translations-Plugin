@@ -65,13 +65,13 @@ const SettingsPage: React.FC = () => {
     const [toast, setToast] = useState({message: null, status: null});
 
     /**
-     * Track for edits.
+     * Track for edits and saved.
      * 
-     * Then if the user made edits and is going out of the tab add an advice.
+     * Then if the user made edits and is going out of the tab add an advice with window events.
      * 
-     * Set edited on false on first load.
+     * Set saved on false on first load.
      */
-    const [edited, setEdited] = useState<boolean>(false);
+    const [saved, setSaved] = useState<boolean>(true);
 
     /**
      * References.
@@ -127,10 +127,10 @@ const SettingsPage: React.FC = () => {
                 regeneratePagination(filtered);
                 setPagPrevNextBtns();
         
-                console.info(
-                    ['Searched entries: ', filtered],
-                    ['Search query: ', searchQuery]
-                )
+                // console.info(
+                //     ['Searched entries: ', filtered],
+                //     ['Search query: ', searchQuery]
+                // )
 
                 return;
             };
@@ -145,15 +145,40 @@ const SettingsPage: React.FC = () => {
      */
     useEffect(
         () => {
-            if (!edited) return;
+            // if (!edited) return;
 
-            setEdited(true);
+            // setEdited(true);
 
             // console.log('formEntries changed');
             // console.log(formEntries);
         },
         [formEntries]
     )
+
+    /**
+     * Detect saved or unsaved information.
+     */
+    useEffect(
+        () => {
+            const handleTabClosing = (e: BeforeUnloadEvent) => {
+                if (!saved) {
+                    e.preventDefault();
+
+                    const msg = 'Non hai salvato le tue traduzioni? Se lascerai questa pagina perderai i tuoi progressi!';
+
+                    e.returnValue = msg;
+                    
+                    return msg;
+                }
+            }
+
+            window.addEventListener('beforeunload', handleTabClosing);
+
+            return () => {
+                window.removeEventListener('beforeunload', handleTabClosing);
+            }
+        }, [saved]
+    );
 
     /**
      * Get translations.
@@ -285,8 +310,13 @@ const SettingsPage: React.FC = () => {
 
                             setSubmitLoading(false);    
 
-                            // Show the toast message  
+                            // Show the toast message  .
                             setToast({message: data.message, status: 'success'});
+
+                            // Set that translations are saved.
+                            setSaved(true);
+                        } else {
+                            setSaved(false);
                         }
         
                     })
@@ -299,6 +329,8 @@ const SettingsPage: React.FC = () => {
                         setSubmitLoading(false);    
 
                         setToast({message: error.response.data.message, status: 'error'});
+
+                        setSaved(false);
                     });
             },
             1200
@@ -337,6 +369,8 @@ const SettingsPage: React.FC = () => {
             setCurrPage(currPage+1)
         }
 
+        setSaved(false);
+
         console.log(formEntries)
     }
 
@@ -365,6 +399,8 @@ const SettingsPage: React.FC = () => {
         }
 
         setFormEntries(formEntries.filter((entry: SingleTranslation) => entry.id !== id));
+
+        setSaved(false);
     } 
 
     /**
@@ -395,6 +431,8 @@ const SettingsPage: React.FC = () => {
 
             return entry;
         }));
+
+        setSaved(false);
     }
 
     /**
@@ -438,6 +476,8 @@ const SettingsPage: React.FC = () => {
                 setToast({message: data.message, status: 'success'});
 
                 setCurrPage(0); // Restart from page 0
+
+                setSaved(true);
             })
             .catch(error => {
                 console.log(error);
@@ -445,6 +485,8 @@ const SettingsPage: React.FC = () => {
                 setDefaultRegeneration(false);
 
                 setToast({message: error.response.data.message, status: 'error'});
+
+                setSaved(false);
             });
     }
 
@@ -478,6 +520,8 @@ const SettingsPage: React.FC = () => {
 
                 // When I delete everything, reset current page to 0.
                 setCurrPage(0);
+
+                setSaved(true);
             })
             .catch(error => {
                 console.log(error)
@@ -485,6 +529,8 @@ const SettingsPage: React.FC = () => {
                 setEntriesDeleting(false);  
 
                 setToast({message: error.response.data.message, status: 'error'});
+
+                setSaved(false);
             });
 
     }
@@ -607,6 +653,8 @@ const SettingsPage: React.FC = () => {
 
                     // After importing data set current page to 0.
                     setCurrPage(0);
+
+                    setSaved(true);
                 })
                 .catch(error => {
                     console.log(error)
@@ -618,6 +666,8 @@ const SettingsPage: React.FC = () => {
                     setEntriesImporting(false); 
 
                     setToast({message: error.response.data.message, status: 'error'});
+
+                    setSaved(false);
                 })
             }, 1200);
         }
@@ -823,6 +873,8 @@ const SettingsPage: React.FC = () => {
                         entriesDeleting={entriesDeleting}
                         entriesImporting={entriesImporting}
                         entriesExporting={entriesExporting}
+
+                        saved={saved}
                     />
                     :
                     <Spinner title="Caricamento in corso..."/>

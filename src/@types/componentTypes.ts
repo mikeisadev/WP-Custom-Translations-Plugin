@@ -82,6 +82,9 @@ export interface TranslationsFormType {
     entriesDeleting: boolean;
     entriesImporting: boolean;
     entriesExporting: boolean;
+
+    // Saved state
+    saved: boolean;
 }
 
 /**

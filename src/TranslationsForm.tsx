@@ -48,8 +48,11 @@ const TranslationsForm = forwardRef<HTMLFormElement, TranslationsFormType>
         defaultRegeneration,
         entriesDeleting,
         entriesImporting,
-        entriesExporting    
+        entriesExporting,
+        
+        saved
     }, formRef) => {
+
         const filteredEntries = formEntries.filter((entry: SingleTranslation, i) => {
             const q = searchQuery ? searchQuery.toLowerCase() : '';
 
@@ -268,7 +271,7 @@ const TranslationsForm = forwardRef<HTMLFormElement, TranslationsFormType>
                         role='submit'
                         type='button'
                         onClick={onTranslationFormSubmit}
-                        disabled={submitLoading}
+                        disabled={submitLoading || saved}
                     >
                         {
                             submitLoading ?
