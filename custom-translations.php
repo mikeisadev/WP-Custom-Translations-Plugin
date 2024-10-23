@@ -3,7 +3,7 @@
  * Plugin Name: Custom Translations - by Michele Mincone
  * Plugin URI: https://michelemincone.com
  * Description: Un plugin specifico per applicare traduzioni dove non vengono visualizzate con altri plugin. Questo plugin sfrutta il filtro "gettext".
- * Version: 1.1.0
+ * Version: 1.2.0
  * Author: Michele Mincone
  * Author URI: https://michelemincone.com
  * License: GPL2
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) exit;
 /**
  * Define common constants.
  */
-define('CTP_PLUGIN_VERSION', '1.1.0');
+define('CTP_PLUGIN_VERSION', '1.2.0');
 define('CTP_PLUGIN_AUTHOR', 'Michele Mincone');
 define('CTP_PLUGIN_AUTHOR_URI', 'https://michelemincone.com');
 define('CTP_PLUGIN_VERSION_TYPE', 'BETA');
