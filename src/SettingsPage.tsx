@@ -198,7 +198,7 @@ const SettingsPage: React.FC = () => {
                     const rows = formRef.current.querySelectorAll('.translations-form .translation-row');
                     const lastRow = rows[rows.length - 1];
 
-                    console.log(lastRow);
+                    // console.log(lastRow);
 
                     lastRow.scrollIntoView({behavior: 'smooth', block: 'center'});
                     lastRow.classList.add('highlight-row');
@@ -232,7 +232,7 @@ const SettingsPage: React.FC = () => {
 
                         reject(responseMessages.missingServerResponseData);
                     } else {
-                        console.log(data);
+                        // console.log(data);
         
                         setFormEntries(data.translations);
                         setMetaData(data.meta_data);
@@ -331,7 +331,7 @@ const SettingsPage: React.FC = () => {
                     .then((response) => {
                         const data = response.data
         
-                        console.log(data);
+                        // console.log(data);
         
                         if (data.status === 200 && data.status_message === 'OK') {
                             setSubmitSuccess(data.message);
@@ -499,7 +499,7 @@ const SettingsPage: React.FC = () => {
         e.preventDefault();
         e.stopPropagation();
         
-        console.log(e.target);
+        // console.log(e.target);
 
         alert("Attenzione: questa funzione non è ancora disponibile. La sto sviluppando - Michele Mincone");
     }
@@ -523,7 +523,7 @@ const SettingsPage: React.FC = () => {
             .then(response => {
                 const data = response.data
 
-                console.log(data);
+                // console.log(data);
 
                 setFormEntries(data.translations_data.translations);
                 setMetaData(data.translations_data.meta_data);
@@ -566,7 +566,7 @@ const SettingsPage: React.FC = () => {
             .then(response => {
                 const data = response.data
 
-                console.log(data);
+                // console.log(data);
 
                 setFormEntries(data.translations_data.translations);
                 setMetaData(data.translations_data.meta_data);
@@ -697,7 +697,7 @@ const SettingsPage: React.FC = () => {
                 .then(response => {
                     const data = response.data
 
-                    console.log(data)
+                    // console.log(data)
 
                     setImportModalContent(<FeedbackText text="Caricamento del file avvenuto con successo!..." status="success"/>);
 
