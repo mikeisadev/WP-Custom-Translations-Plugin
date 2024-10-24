@@ -21,6 +21,7 @@
     background-color: #f9f9f9;
     padding: 10px !important;
     gap: 10px;
+    align-items: center !important;
 }
 
 .form-table th, .form-table td {
@@ -28,6 +29,7 @@
     text-align: left;
     border: none;
     width: 99% !important;
+    margin: 0px !important;
 }
 
 .form-table .actions, .form-table .action, .form-table .enumerations, .form-table .enum {    
@@ -77,6 +79,16 @@
     background: #f0f0f1;
     width: 100%;
     padding: 6px;
+}
+
+.trnaslations-form .translation-row {
+    background: transparent;
+    transition: 500ms all;
+}
+
+.translations-form .highlight-row {
+    background-color: rgb(167, 240, 167);  
+    transition: 500ms all;
 }
 
 .button.button-red {
@@ -304,6 +316,59 @@
     gap: 4px;
     overflow-x: scroll;
     max-width: 300px;
+}
+
+/* List */
+ul {
+    list-style-type: circle;
+    padding: 0 0 0 20px;
+}
+
+/* Accordion */
+.accordion-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0 0 20px 0;
+}
+
+.accordion-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    justify-content: space-between;
+    background-color: #f9f9f9;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.accordion-block .accordion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    background-color: transparent;
+    transform: 500ms all;
+    padding: 5px 10px;
+}
+
+.accordion-block .accordion-header:hover {
+    background-color: #e0e0e0;
+}
+
+.accordion-block .accordion-body {
+    padding: 0px;
+    margin: 0px;
+    overflow: hidden;
+}
+
+.accordion-open .accordion-header {
+    background-color: #e0e0e0;
+}
+
+.accordion-open .accordion-body {
+    padding: 5px 10px;
 }
 
 /* Responsive table - displays properly on mobile */

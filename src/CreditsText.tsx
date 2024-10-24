@@ -1,8 +1,6 @@
 export const CreditsText: React.FC = () => {
     return (
         <>
-            <div className="ctp-separator"></div>
-            
             <div className="wrap">
                 <p><small><strong>Custom Translations (traduzioni personalizzate) Plugin - Realizzato da <a href="https://michelemincone.com" target="_blank" rel="noopener noreferrer">Michele Mincone</a></strong></small></p>
 

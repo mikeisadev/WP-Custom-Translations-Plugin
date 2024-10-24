@@ -63,7 +63,7 @@ const TranslationsForm = forwardRef<HTMLFormElement, TranslationsFormType>
         const paginationEnd: number = paginationStart + entriesPerPage;
 
         return (
-            <form ref={formRef} method="post" action="#" className='form-wrap' onSubmit={onFormSubmit}>
+            <form ref={formRef} method="post" action="#" className='form-wrap translations-form' onSubmit={onFormSubmit}>
                 <AdvicesText />
 
                 <div className='ctp-separator' style={{margin: '10px 0'}}></div>

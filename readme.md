@@ -34,11 +34,11 @@ Future versions of this plugin will provide:
 - Easy translation management
 - User-friendly interface
 - Seamless integration with WordPress
-- 'gettext' WordPress filter to apply translations
+- 'gettext' WordPress filter to apply translations. (from version 1.2.0 also 'ngettext' filter for plural strings)
 - Export and import translations feature
 - Pagination, search translations and translations per page for pagination
 - Advice when you didn't saved translations to avoid losing progress
-- (+ from version 1.2.0) plural strings translations between "_n()" function using "ngettext" filter (See on this page "How to translate plural strings").
+- (+ from version 1.2.0) plural strings translations between "_n()" function using "ngettext" filter leveraging a custom string (See on this page "How to translate plural strings").
 
 ### How to translate plural strings.
 For singular strings, this plugin will take the input inside the column "String to translate" and through the wordpress php filter "gettext" it will find that string. Then, when that string is found, the translation you inserted on the second column of this plugin interface ("translated string") will be returned to apply the translation.
@@ -123,7 +123,16 @@ In the future I'll implement a better way to translate plural strings introducin
 - Better management on the frontend on how inputs are updated (when typing the new translation or string to translate) and how this action is made while searching
 - An advice message (alert javascript message) is added if you didn't saved translations to avoid losing progress for mistake.
 ### 1.2.0
-- Adding plural strings translations on "_n()" function of wordpress via the "ngettext" filter. See on this page **How to translate plural strings** using the custom syntax %_ctp_n(singular: "Singular", plural: "Plural"). 
+- Adding plural strings translations on "_n()" function of wordpress via the "ngettext" filter. See on this page **How to translate plural strings**: using the custom syntax %_ctp_n(singular: "Singular", plural: "Plural"). 
+- Solving minor issues and bug fixing:
+    - **Pagination bug fixing**: Let's say you have 5 pages and you are on page 3. When adding a row, the code was pushing you on page 4 instead of 5 (or page 6 if the entries for page 5 were at maximum number of entries). This dynamic now is handled in a better way.
+    - **Search results pagination bug fixing**: When you search for a string search results will appear and be paginated. But if you add a row, then search must be cleared and you should be on the last row added with focusing input on that row, exiting the translations search mode.
+    - **Renaming functions**: Some functions had an out of scope and out of context name. So I renamed them to be more clear on what they exactly do.
+    - **Adding plural translations documentation**: A short description on how to apply translations to strings that can be singular or plural was added on the plugin settings page.
+    - **Focusing last added row field**: When adding a row, the focus is now on the last added row field to be more user friendly. Also background color of the row changes for a few seconds.
+    - **Not applying filter on admin page**: The plugin will not apply the translations on the admin page, only on the front-end. Check `class-ctp-apply-translations.php` where I added `if (is_admin()) return;`.
+- User experience improvement:
+    - General info about the plugin and how to use it now is wrapped around accordion elements.
 
 ## License
 This plugin is licensed under the [GPLv2 or later](https://www.gnu.org/licenses/gpl-2.0.html).

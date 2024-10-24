@@ -1,3 +1,5 @@
+import React from "react";
+
 /**
  * Translations form type interface.
  * 
@@ -138,4 +140,13 @@ export interface ToastMessageType {
     timeout: number;
     onToastClose: () => void;
     status: 'success' | 'warning' | 'error' | 'info';
+}
+
+/**
+ * Accordion info type interface.
+ */
+export interface AccordionInfoType {
+    title: string | React.ReactNode;
+    content: string | React.ReactNode;
+    icon?: HTMLElement;
 }

@@ -7,6 +7,7 @@ use CTP\CTP_Assets;
 use CTP\CTP_Translations_REST_API;
 use CTP\CTP_Apply_Translations;
 use CTP\CTP_Default_Translations;
+use CTP\CTP_Parser;
 
 if (!defined('ABSPATH')) exit;
 
@@ -87,6 +88,7 @@ final class CTP_Init {
     private function require_files() {
         require_once CTP_DIR . '/inc/class-ctp-settings-page.php';
         require_once CTP_DIR . '/inc/class-ctp-assets.php';
+        require_once CTP_DIR . '/inc/class-ctp-parser.php';
         require_once CTP_DIR . '/inc/class-ctp-translations-rest-api.php';
         require_once CTP_DIR . '/inc/class-ctp-apply-translations.php';
         require_once CTP_DIR . '/inc/class-ctp-default-translations.php';

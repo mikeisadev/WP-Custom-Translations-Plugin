@@ -74,6 +74,11 @@ const SettingsPage: React.FC = () => {
     const [saved, setSaved] = useState<boolean>(true);
 
     /**
+     * Track last action performed.
+     */
+    const [lastAction, setLastAction] = useState(null); 
+
+    /**
      * References.
      */
     const formRef = useRef(null);
@@ -179,6 +184,36 @@ const SettingsPage: React.FC = () => {
             }
         }, [saved]
     );
+
+    /**
+     * Track last action performed.
+     */
+    useEffect(
+        () => {
+            if (!lastAction) return;    
+
+            switch (lastAction) {
+                // Focus on the last row added.
+                case 'add-row':
+                    const rows = formRef.current.querySelectorAll('.translations-form .translation-row');
+                    const lastRow = rows[rows.length - 1];
+
+                    console.log(lastRow);
+
+                    lastRow.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    lastRow.classList.add('highlight-row');
+                    lastRow.querySelector('input[type="text"]').focus();
+
+                    setTimeout(() => { lastRow.classList.remove('highlight-row') }, 3000);
+
+                    break;
+            }
+
+            // Reset last action.
+            setLastAction(null);
+        },
+        [lastAction]
+    )
 
     /**
      * Get translations.
@@ -346,6 +381,19 @@ const SettingsPage: React.FC = () => {
         e.preventDefault(); 
         e.stopPropagation();
 
+        /**
+         * You have searched before?
+         * 
+         * If you have searched and still searching and you are adding a row,
+         * go out of search mode and clear the search query.
+         */
+        if (hasSearched) {
+            setHasSearched(false);
+            setSearchQuery('');
+
+            // console.log('You searched before. Error can occur! So I clean searching and go back to normal mode.');
+        }
+
         if (formEntries.length === 0) {
             setFormEntries([
                 {
@@ -365,13 +413,22 @@ const SettingsPage: React.FC = () => {
             ]);
         }
 
-        if (pageEntriesLimitReached()) {
-            setCurrPage(currPage+1)
+        /**
+         * If last page is full, go to the new generated page (nPages + 1, or nPages if React do not update the state immediately).
+         * 
+         * If the last page is not full, but current page has reached the limit, go to the last page.
+         */
+        if (isLastPageFull()) {
+            setCurrPage(nPages);
+        } else if (pageEntriesLimitReached()) {
+            setCurrPage(nPages - 1);
         }
 
         setSaved(false);
 
-        console.log(formEntries)
+        setLastAction('add-row');
+
+        // console.log(formEntries)
     }
 
     /**
@@ -394,7 +451,7 @@ const SettingsPage: React.FC = () => {
          * 
          * If we go back when current page is 0 we'll get a pagination bug if we add more entries.
          */
-        if (currPage !== 0 && lastPageEntryReached()) {
+        if (currPage !== 0 && lastEntryCurrPageReached()) {
             setCurrPage(currPage - 1);
         }
 
@@ -773,24 +830,24 @@ const SettingsPage: React.FC = () => {
      * 
      * So, in the "currPage" I want to know how many entries I have.
      */
-    function getEntriesPerPage(): number {
+    function getCurrPageEntriesNum(): number {
         // Define the limits of the entries (interval)
-        const intervalStart = currPage * entriesPerPage;
-        const intervalEnd = intervalStart + entriesPerPage;
+        const start = currPage * entriesPerPage;
+        const end = start + entriesPerPage;
 
         /**
          * Get the entries withing the interval (entries in the current page).
          * 
          * So get an array with current entries on current interval (or current page of a range of elements).
          */
-        const currentEntries = formEntries.slice(intervalStart, intervalEnd);
+        const currentEntries = formEntries.slice(start, end);
 
         /**
          * Get the number of entries.
          */
         const entriesNum = currentEntries.length;
 
-        console.log('page ' + currPage + ', ', 'Total entries: ' + entriesNum);
+        // console.log('page ' + currPage + ', ', 'Total entries: ' + entriesNum);
 
         return entriesNum;
     }
@@ -801,16 +858,35 @@ const SettingsPage: React.FC = () => {
      * Yes if current page entries is equal to entries per page limit.
      */
     function pageEntriesLimitReached(): boolean {
-        return getEntriesPerPage() === entriesPerPage;
+        return getCurrPageEntriesNum() === entriesPerPage;
     }
 
     /**
      * Have we reached the last element on current page?
      * 
-     * Get entries per page number and if it is equal to 1 return true
+     * Get entries per page number and if it is equal to 1 return true.
+     * 
+     * NOTE: This function calculates if we reached the last entry only on the current page (the selected one from the user).
      */
-    function lastPageEntryReached(): boolean {
-        return getEntriesPerPage() === 1;
+    function lastEntryCurrPageReached(): boolean {
+        return getCurrPageEntriesNum() === 1;
+    }
+
+    /**
+     * This function will tell us if the last page is full.
+     * 
+     * This function works with 'entriesPerPage' and length of 'formEntries'.
+     * 
+     * NOTE: the last page is not the current page. This function
+     * will rely on a global calculation and not on 'currPage' variable.
+     */
+    function isLastPageFull(): boolean {
+        const start = (nPages - 1) * entriesPerPage;
+        const end = start + entriesPerPage;
+
+        const lastPageEntries = formEntries.slice(start, end);
+
+        return lastPageEntries.length === entriesPerPage;
     }
 
     // Render on error.
