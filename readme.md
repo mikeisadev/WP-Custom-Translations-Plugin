@@ -1,6 +1,6 @@
 # Traduzioni personalizzate - Custom Translations Plugin
 
-## **Last release version**: [1.1.0](https://github.com/mikeisadev/WP-Custom-Translations-Plugin/tree/v1.1.0) 
+## **Last release version**: [1.2.0](https://github.com/mikeisadev/WP-Custom-Translations-Plugin/tree/v1.2.0) 
 
 ## General information
 - **Author**: Michele Mincone
